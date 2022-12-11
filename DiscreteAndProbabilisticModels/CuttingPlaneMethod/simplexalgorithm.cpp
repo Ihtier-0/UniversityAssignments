@@ -9,43 +9,49 @@
 /// SimplexAlgorithm new
 ////////////////////////////////////////////////////////////////////////////////
 
-SimplexAlgorithm::SimplexAlgorithm(const SolveContext &solveContext)
-    : mSolve(solveContext) {}
+SimplexAlgorithm::SimplexAlgorithm(const SolveContext &context)
+    : mSolve(context) {}
 
 void SimplexAlgorithm::printCallback(const int &step,
-                                     const SolveContext &solveContext) {
+                                     const SolveContext &context) {
   std::cout << "step:" << step << std::endl;
   std::cout << "constraintsCoefficients:\n"
-            << solveContext.constraintsCoefficients << std::endl;
+            << context.constraintsCoefficients << std::endl;
   std::cout << "constraintsConstants:\n"
-            << solveContext.constraintsConstants << std::endl;
+            << context.constraintsConstants << std::endl;
   std::cout << "objectiveFunctionCoefficients:\n"
-            << solveContext.objectiveFunctionCoefficients << std::endl;
+            << context.objectiveFunctionCoefficients << std::endl;
   std::cout << std::endl;
 }
 
 SimplexAlgorithmUniquePtr
-SimplexAlgorithm::create(const SolveContext &solveContext) {
+SimplexAlgorithm::create(const SolveContext &context) {
   SimplexAlgorithmUniquePtr result = nullptr;
 
-  const Size rows = solveContext.constraintsCoefficients.size();
-  const Size cols = solveContext.constraintsCoefficients.at(0).size();
+  const Size rows = context.constraintsCoefficients.size();
+  const Size cols = context.constraintsCoefficients.at(0).size();
 
-  if (solveContext.constraintsConstants.size() != rows) {
+  if (context.constraintsConstants.size() != rows) {
     return result;
   }
 
-  if (solveContext.objectiveFunctionCoefficients.size() != cols) {
+  if (context.objectiveFunctionCoefficients.size() != cols) {
     return result;
   }
 
-  for (const VectorCoefficients &row : solveContext.constraintsCoefficients) {
+  for (const VectorCoefficients &row : context.constraintsCoefficients) {
     if (row.size() != cols) {
       return result;
     }
   }
 
-  result.reset(new SimplexAlgorithm(solveContext));
+  for (const Real &c : context.constraintsConstants) {
+    if (c < 0) {
+      return result;
+    }
+  }
+
+  result.reset(new SimplexAlgorithm(context));
 
   return result;
 }

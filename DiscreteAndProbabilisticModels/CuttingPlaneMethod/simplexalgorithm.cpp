@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 SimplexAlgorithm::SimplexAlgorithm(const SolveContext &solveContext)
-    : mSolveContext(solveContext) {}
+    : mSolve(solveContext) {}
 
 void SimplexAlgorithm::printCallback(const int &step,
                                      const SolveContext &solveContext) {
@@ -57,7 +57,7 @@ SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
   EndType end;
 
   while (true) {
-    CalculateCallback(step, mSolveContext);
+    CalculateCallback(step, mSolve);
 
     const VectorIndices basis = findBasis();
 
@@ -96,8 +96,8 @@ SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
 }
 
 VectorIndices SimplexAlgorithm::findBasis() {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
-  const Size cols = mSolveContext.constraintsCoefficients.at(0).size();
+  const Size rows = mSolve.constraintsCoefficients.size();
+  const Size cols = mSolve.constraintsCoefficients.at(0).size();
 
   VectorIndices result(rows);
 
@@ -114,7 +114,7 @@ VectorIndices SimplexAlgorithm::findBasis() {
 }
 
 Size SimplexAlgorithm::rowBasisIndex(const Size &colIndex) {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
+  const Size rows = mSolve.constraintsCoefficients.size();
 
   bool findOne = false;
   bool equalOne;
@@ -123,10 +123,10 @@ Size SimplexAlgorithm::rowBasisIndex(const Size &colIndex) {
   Size index = invalidIndex;
 
   for (Size row = 0; row < rows; ++row) {
-    equalOne = fuzzyEquals(
-        mSolveContext.constraintsCoefficients.at(row).at(colIndex), 1);
-    equalZero = fuzzyEquals(
-        mSolveContext.constraintsCoefficients.at(row).at(colIndex), 0);
+    equalOne =
+        fuzzyEquals(mSolve.constraintsCoefficients.at(row).at(colIndex), 1);
+    equalZero =
+        fuzzyEquals(mSolve.constraintsCoefficients.at(row).at(colIndex), 0);
 
     if (equalOne) {
       if (findOne) {
@@ -154,7 +154,7 @@ SimplexAlgorithm::getBasisCoefficients(const VectorIndices &basis) {
 
   for (Size i = 0; i < nBasis; ++i) {
     basisCoefficients.at(i) =
-        mSolveContext.objectiveFunctionCoefficients.at(basis.at(i));
+        mSolve.objectiveFunctionCoefficients.at(basis.at(i));
   }
 
   return basisCoefficients;
@@ -162,13 +162,13 @@ SimplexAlgorithm::getBasisCoefficients(const VectorIndices &basis) {
 
 VectorCoefficients
 SimplexAlgorithm::getEvaluation(const VectorCoefficients &basisCoefficients) {
-  const Size cols = mSolveContext.constraintsCoefficients.at(0).size();
+  const Size cols = mSolve.constraintsCoefficients.at(0).size();
 
   VectorCoefficients result;
 
   for (Size i = 0; i < cols; ++i) {
     result.emplace_back(dotProductWithCol(basisCoefficients, i) -
-                        mSolveContext.objectiveFunctionCoefficients.at(i));
+                        mSolve.objectiveFunctionCoefficients.at(i));
   }
 
   return result;
@@ -176,13 +176,12 @@ SimplexAlgorithm::getEvaluation(const VectorCoefficients &basisCoefficients) {
 
 Real SimplexAlgorithm::dotProductWithCol(const VectorCoefficients &vector,
                                          const Size &index) {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
+  const Size rows = mSolve.constraintsCoefficients.size();
 
   Real result = 0;
 
   for (Size i = 0; i < rows; ++i) {
-    result +=
-        vector.at(i) * mSolveContext.constraintsCoefficients.at(i).at(index);
+    result += vector.at(i) * mSolve.constraintsCoefficients.at(i).at(index);
   }
 
   return result;
@@ -214,10 +213,10 @@ SimplexAlgorithm::getEndType(const VectorCoefficients &evaluation) {
 }
 
 bool SimplexAlgorithm::negativeCol(const Size &index) {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
+  const Size rows = mSolve.constraintsCoefficients.size();
 
   for (Size i = 0; i < rows; ++i) {
-    if (mSolveContext.constraintsCoefficients.at(i).at(index) > 0) {
+    if (mSolve.constraintsCoefficients.at(i).at(index) > 0) {
       return false;
     }
   }
@@ -226,14 +225,14 @@ bool SimplexAlgorithm::negativeCol(const Size &index) {
 }
 
 Size SimplexAlgorithm::addToBasisRow(const Size addToBasisCol) {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
+  const Size rows = mSolve.constraintsCoefficients.size();
 
   Size row = 0;
 
   Real value;
 
   for (Size r = 0; r < rows; ++r) {
-    value = mSolveContext.constraintsCoefficients.at(r).at(addToBasisCol);
+    value = mSolve.constraintsCoefficients.at(r).at(addToBasisCol);
 
     if (value > 0) {
       row = r;
@@ -242,12 +241,12 @@ Size SimplexAlgorithm::addToBasisRow(const Size addToBasisCol) {
   }
 
   for (Size r = 0; r < rows; ++r) {
-    value = mSolveContext.constraintsCoefficients.at(r).at(addToBasisCol);
+    value = mSolve.constraintsCoefficients.at(r).at(addToBasisCol);
 
-    if (value > 0 && mSolveContext.constraintsConstants.at(r) / value <
-                         mSolveContext.constraintsConstants.at(row) /
-                             mSolveContext.constraintsCoefficients.at(row).at(
-                                 addToBasisCol)) {
+    if (value > 0 &&
+        mSolve.constraintsConstants.at(r) / value <
+            mSolve.constraintsConstants.at(row) /
+                mSolve.constraintsCoefficients.at(row).at(addToBasisCol)) {
       row = r;
     }
   }
@@ -256,40 +255,40 @@ Size SimplexAlgorithm::addToBasisRow(const Size addToBasisCol) {
 }
 
 void SimplexAlgorithm::addToBasis(const Size row, const Size col) {
-  const Size rows = mSolveContext.constraintsCoefficients.size();
+  const Size rows = mSolve.constraintsCoefficients.size();
 
-  const Real value = mSolveContext.constraintsCoefficients.at(row).at(col);
+  const Real value = mSolve.constraintsCoefficients.at(row).at(col);
 
-  mSolveContext.constraintsCoefficients.at(row) =
-      mSolveContext.constraintsCoefficients.at(row) / value;
+  mSolve.constraintsCoefficients.at(row) =
+      mSolve.constraintsCoefficients.at(row) / value;
 
-  mSolveContext.constraintsConstants.at(row) /= value;
+  mSolve.constraintsConstants.at(row) /= value;
 
-  mSolveContext.constraintsCoefficients.at(row).at(col) = 1;
+  mSolve.constraintsCoefficients.at(row).at(col) = 1;
 
   for (Size r = 0; r < rows; ++r) {
     if (r == row) {
       continue;
     }
 
-    mSolveContext.constraintsConstants.at(r) =
-        mSolveContext.constraintsConstants.at(r) -
-        mSolveContext.constraintsCoefficients.at(r).at(col) *
-            mSolveContext.constraintsConstants.at(row);
+    mSolve.constraintsConstants.at(r) =
+        mSolve.constraintsConstants.at(r) -
+        mSolve.constraintsCoefficients.at(r).at(col) *
+            mSolve.constraintsConstants.at(row);
 
-    mSolveContext.constraintsCoefficients.at(r) =
-        mSolveContext.constraintsCoefficients.at(r) -
-        mSolveContext.constraintsCoefficients.at(r).at(col) *
-            mSolveContext.constraintsCoefficients.at(row);
+    mSolve.constraintsCoefficients.at(r) =
+        mSolve.constraintsCoefficients.at(r) -
+        mSolve.constraintsCoefficients.at(r).at(col) *
+            mSolve.constraintsCoefficients.at(row);
   }
 
   for (Size r = 0; r < rows; ++r) {
-    mSolveContext.constraintsCoefficients.at(r).at(col) = r == row ? 1 : 0;
+    mSolve.constraintsCoefficients.at(r).at(col) = r == row ? 1 : 0;
   }
 }
 
 VectorCoefficients SimplexAlgorithm::getAnswer() {
-  const Size cols = mSolveContext.constraintsCoefficients.at(0).size();
+  const Size cols = mSolve.constraintsCoefficients.at(0).size();
 
   const VectorIndices basis = findBasis();
 
@@ -302,7 +301,7 @@ VectorCoefficients SimplexAlgorithm::getAnswer() {
   for (const Size b : basis) {
     const Size row = rowBasisIndex(b);
 
-    result.at(b) = mSolveContext.constraintsConstants.at(row);
+    result.at(b) = mSolve.constraintsConstants.at(row);
   }
 
   return result;

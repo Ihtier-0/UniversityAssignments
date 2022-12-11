@@ -1,49 +1,82 @@
 #include <iostream>
 
+#include "canonicaladapter.h"
 #include "coefficientsutils.h"
 #include "globals.h"
-#include "simplexalgorithm.h"
 
 int main() {
   try {
-    // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
+    {
+      // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
 
-    // 2 * x1     - x2 +  0 - 2 * x4 <= 16
-    // 3 * x1 + 2 * x2 + x3 - 3 * x4  = 18
-    //   - x1 + 3 * x2 +  0 + 4 * x4 <= 24
+      // 2 * x1     - x2 +  0 - 2 * x4 <= 16
+      // 3 * x1 + 2 * x2 + x3 - 3 * x4  = 18
+      //   - x1 + 3 * x2 +  0 + 4 * x4 <= 24
 
-    //
+      //
 
-    // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
+      // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
 
-    // 2 * x1     - x2 +  0 - 2 * x4 + x5 +  0 = 16
-    // 3 * x1 + 2 * x2 + x3 - 3 * x4 +  0 +  0 = 18
-    //   - x1 + 3 * x2 +  0 + 4 * x4 +  0 + x6 = 24
+      // 2 * x1     - x2 +  0 - 2 * x4 + x5 +  0 = 16
+      // 3 * x1 + 2 * x2 + x3 - 3 * x4 +  0 +  0 = 18
+      //   - x1 + 3 * x2 +  0 + 4 * x4 +  0 + x6 = 24
 
-    SolveContext context;
-    context.objectiveFunctionCoefficients = {2.0f,  3.0f, 0.0f,
-                                             -1.0f, 0.0f, 0.0f};
+      SimplexAlgorithm::SolveContext context;
+      context.objectiveFunctionCoefficients = {2.0f,  3.0f, 0.0f,
+                                               -1.0f, 0.0f, 0.0f};
 
-    // clang-format off
-    context.constraintsCoefficients = {
-        { 2.0f, -1.0f,  0.0f, -2.0f, 1.0f, 0.0f},
-        { 3.0f,  2.0f,  1.0f, -3.0f, 0.0f, 0.0f},
-        {-1.0f,  3.0f,  0.0f,  4.0f, 0.0f, 1.0f}
-    };
-    // clang-format on
+      // clang-format off
+      context.constraintsCoefficients = {
+          { 2.0f, -1.0f,  0.0f, -2.0f, 1.0f, 0.0f},
+          { 3.0f,  2.0f,  1.0f, -3.0f, 0.0f, 0.0f},
+          {-1.0f,  3.0f,  0.0f,  4.0f, 0.0f, 1.0f}
+      };
+      // clang-format on
 
-    context.constraintsConstants = {16.0f, 18.0f, 24.0f};
+      context.constraintsConstants = {16.0f, 18.0f, 24.0f};
 
-    SimplexAlgorithmUniquePtr simplex = SimplexAlgorithm::create(context);
+      SimplexAlgorithmUniquePtr simplex = SimplexAlgorithm::create(context);
 
-    if (!simplex) {
-      return -1;
+      if (!simplex) {
+        return -1;
+      }
+
+      VectorCoefficients answer =
+          simplex->calculate(SimplexAlgorithm::printCallback);
+
+      std::cout << "answer: " << answer << std::endl;
     }
 
-    VectorCoefficients answer =
-        simplex->calculate(SimplexAlgorithm::printCallback);
+    {
+      // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
 
-    std::cout << "answer: " << answer << std::endl;
+      // 2 * x1     - x2 +  0 - 2 * x4 <= 16
+      // 3 * x1 + 2 * x2 + x3 - 3 * x4  = 18
+      //   - x1 + 3 * x2 +  0 + 4 * x4 <= 24
+
+      CanonicalAdapter::SolveContext context;
+      context.objectiveFunctionCoefficients = {2.0f, 3.0f, 0.0f, -1.0f};
+      context.type = CanonicalAdapter::OptimizationType::Max;
+
+      // clang-format off
+      context.constraints = {
+          {{ 2.0f, -1.0f,  0.0f, -2.0f}, CanonicalAdapter::Sign::le, 16},
+          {{ 3.0f,  2.0f,  1.0f, -3.0f}, CanonicalAdapter::Sign::eq, 18},
+          {{-1.0f,  3.0f,  0.0f,  4.0f}, CanonicalAdapter::Sign::le, 24}
+      };
+      // clang-format on
+
+      CanonicalAdapterUniquePtr simplex = CanonicalAdapter::create(context);
+
+      if (!simplex) {
+        return -1;
+      }
+
+      VectorCoefficients answer =
+          simplex->calculate(SimplexAlgorithm::printCallback);
+
+      std::cout << "answer: " << answer << std::endl;
+    }
 
     return 0;
   } catch (std::exception &exception) {

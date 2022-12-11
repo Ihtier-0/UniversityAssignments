@@ -9,13 +9,14 @@
 class SimplexAlgorithm;
 using SimplexAlgorithmUniquePtr = std::unique_ptr<SimplexAlgorithm>;
 
-struct SolveContext {
-  MatrixCoefficients constraintsCoefficients;
-  VectorCoefficients constraintsConstants;
-  VectorCoefficients objectiveFunctionCoefficients;
-};
-
 class SimplexAlgorithm {
+public:
+  struct SolveContext {
+    MatrixCoefficients constraintsCoefficients;
+    VectorCoefficients constraintsConstants;
+    VectorCoefficients objectiveFunctionCoefficients;
+  };
+
 private:
   SimplexAlgorithm() = delete;
   SimplexAlgorithm(const SimplexAlgorithm &) = delete;
@@ -56,7 +57,7 @@ private:
 
   VectorCoefficients getAnswer();
 
-  SolveContext mSolveContext;
+  SolveContext mSolve;
 
   Real maximum;
 };

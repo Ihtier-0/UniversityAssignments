@@ -1,22 +1,14 @@
 #ifndef SIMPLEXALGORITHM_H
 #define SIMPLEXALGORITHM_H
 
-#include "globals.h"
-
 #include <functional>
 #include <memory>
 
-class SimplexAlgorithm;
-using SimplexAlgorithmUniquePtr = std::unique_ptr<SimplexAlgorithm>;
+#include "canonicalsolver.h"
+#include "globals.h"
+#include "solvecontext.h"
 
-class SimplexAlgorithm {
-public:
-  struct SolveContext {
-    MatrixCoefficients constraintsCoefficients;
-    VectorCoefficients constraintsConstants;
-    VectorCoefficients objectiveFunctionCoefficients;
-  };
-
+class SimplexAlgorithm : public CanonicalSolver {
 private:
   SimplexAlgorithm() = delete;
   SimplexAlgorithm(const SimplexAlgorithm &) = delete;
@@ -24,16 +16,15 @@ private:
   SimplexAlgorithm operator=(const SimplexAlgorithm &) = delete;
   SimplexAlgorithm operator=(SimplexAlgorithm &&) = delete;
 
-  SimplexAlgorithm(const SolveContext &solveContext);
+  SimplexAlgorithm(const CanonicalContext &canonicalContext);
+  virtual ~SimplexAlgorithm() override;
 
 public:
-  using CalculateCallback =
-      std::function<void(const int &step, const SolveContext &solveContext)>;
-  static void printCallback(const int &step, const SolveContext &solveContext);
+  static CanonicalSolverUniquePtr
+  create(const CanonicalContext &canonicalContext);
 
-  static SimplexAlgorithmUniquePtr create(const SolveContext &solveContext);
-
-  VectorCoefficients calculate(const CalculateCallback &calculateCallback = {});
+  virtual VectorCoefficients
+  calculate(const CalculateCallback &calculateCallback = {}) override;
 
 private:
   constexpr static const Size invalidIndex = static_cast<Size>(-1); // shit
@@ -56,10 +47,6 @@ private:
   void addToBasis(const Size row, const Size col);
 
   VectorCoefficients getAnswer();
-
-  SolveContext mSolve;
-
-  Real maximum;
 };
 
 #endif // SIMPLEXALGORITHM_H

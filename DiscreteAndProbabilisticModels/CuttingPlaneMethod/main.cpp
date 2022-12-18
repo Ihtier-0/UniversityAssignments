@@ -3,6 +3,7 @@
 #include "canonicaladapter.h"
 #include "coefficientsutils.h"
 #include "globals.h"
+#include "simplexalgorithm.h"
 
 int main() {
   try {
@@ -21,7 +22,7 @@ int main() {
       // 3 * x1 + 2 * x2 + x3 - 3 * x4 +  0 +  0 = 18
       //   - x1 + 3 * x2 +  0 + 4 * x4 +  0 + x6 = 24
 
-      SimplexAlgorithm::SolveContext context;
+      CanonicalContext context;
       context.objectiveFunctionCoefficients = {2.0f,  3.0f, 0.0f,
                                                -1.0f, 0.0f, 0.0f};
 
@@ -35,14 +36,13 @@ int main() {
 
       context.constraintsConstants = {16.0f, 18.0f, 24.0f};
 
-      SimplexAlgorithmUniquePtr simplex = SimplexAlgorithm::create(context);
+      CanonicalSolverUniquePtr simplex = SimplexAlgorithm::create(context);
 
       if (!simplex) {
         return -1;
       }
 
-      VectorCoefficients answer =
-          simplex->calculate(SimplexAlgorithm::printCallback);
+      VectorCoefficients answer = simplex->calculate(printCallback);
 
       std::cout << "answer: " << answer << std::endl;
     }
@@ -54,26 +54,26 @@ int main() {
       // 3 * x1 + 2 * x2 + x3 - 3 * x4  = 18
       //   - x1 + 3 * x2 +  0 + 4 * x4 <= 24
 
-      CanonicalAdapter::SolveContext context;
+      SolveContext context;
       context.objectiveFunctionCoefficients = {2.0f, 3.0f, 0.0f, -1.0f};
-      context.type = CanonicalAdapter::OptimizationType::Max;
+      context.type = OptimizationType::Max;
 
       // clang-format off
       context.constraints = {
-          {{ 2.0f, -1.0f,  0.0f, -2.0f}, CanonicalAdapter::Sign::le, 16},
-          {{ 3.0f,  2.0f,  1.0f, -3.0f}, CanonicalAdapter::Sign::eq, 18},
-          {{-1.0f,  3.0f,  0.0f,  4.0f}, CanonicalAdapter::Sign::le, 24}
+          {{ 2.0f, -1.0f,  0.0f, -2.0f}, Sign::le, 16},
+          {{ 3.0f,  2.0f,  1.0f, -3.0f}, Sign::eq, 18},
+          {{-1.0f,  3.0f,  0.0f,  4.0f}, Sign::le, 24}
       };
       // clang-format on
 
-      CanonicalAdapterUniquePtr simplex = CanonicalAdapter::create(context);
+      CanonicalAdapterUniquePtr simplex =
+          CanonicalAdapter::create(context, SimplexAlgorithm::create);
 
       if (!simplex) {
         return -1;
       }
 
-      VectorCoefficients answer =
-          simplex->calculate(SimplexAlgorithm::printCallback);
+      VectorCoefficients answer = simplex->calculate(printCallback);
 
       std::cout << "answer: " << answer << std::endl;
     }

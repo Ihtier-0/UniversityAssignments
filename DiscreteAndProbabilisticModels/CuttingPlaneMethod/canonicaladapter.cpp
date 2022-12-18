@@ -3,59 +3,44 @@
 #include "coefficientsutils.h"
 
 CanonicalAdapter::CanonicalAdapter(const SolveContext &context,
-                                   SimplexAlgorithmUniquePtr simplex)
-    : mContext(context), mSimplex(std::move(simplex)) {}
+                                   CanonicalSolverUniquePtr solver)
+    : mContext(context), mSolver(std::move(solver)) {}
 
-CanonicalAdapterUniquePtr
-CanonicalAdapter::create(const SolveContext &context) {
+CanonicalAdapterUniquePtr CanonicalAdapter::create(const SolveContext &context,
+                                                   SolverCreator creator) {
   CanonicalAdapterUniquePtr result = nullptr;
 
-  if (context.type == OptimizationType::Unknown) {
+  if (!valid(context)) {
     return result;
   }
 
-  const Size cols = context.constraints.at(0).coefficients.size();
+  CanonicalSolverUniquePtr solver = creator(toCanonical(context));
 
-  if (context.objectiveFunctionCoefficients.size() != cols) {
+  if (!solver) {
     return result;
   }
 
-  for (const Constraint &c : context.constraints) {
-    if (c.sign == Sign::Unknown || c.coefficients.size() != cols) {
-      return result;
-    }
-  }
-
-  SimplexAlgorithmUniquePtr simplex =
-      SimplexAlgorithm::create(toCanonical(context));
-
-  if (!simplex) {
-    return result;
-  }
-
-  result.reset(new CanonicalAdapter(context, std::move(simplex)));
+  result.reset(new CanonicalAdapter(context, std::move(solver)));
 
   return result;
 }
 
-VectorCoefficients CanonicalAdapter::calculate(
-    const SimplexAlgorithm::CalculateCallback &callback) {
-  return fromCanonical(mSimplex->calculate(callback));
+VectorCoefficients
+CanonicalAdapter::calculate(const CalculateCallback &callback) {
+  return fromCanonical(mSolver->calculate(callback));
 }
 
-static void addVariable(SimplexAlgorithm::SolveContext &simplex,
-                        const CanonicalAdapter::SolveContext &canonical,
-                        const Size &index) {
+static void addVariable(CanonicalContext &simplex,
+                        const SolveContext &canonical, const Size &index) {
   const auto &constraint = canonical.constraints.at(index);
 
-  if (constraint.sign == CanonicalAdapter::Sign::eq) {
+  if (constraint.sign == Sign::eq) {
     return;
   }
 
   Real value = 1;
 
-  if (constraint.sign == CanonicalAdapter::Sign::ge ||
-      constraint.sign == CanonicalAdapter::Sign::gt) {
+  if (constraint.sign == Sign::ge || constraint.sign == Sign::gt) {
     value = -1;
   }
 
@@ -66,13 +51,12 @@ static void addVariable(SimplexAlgorithm::SolveContext &simplex,
   simplex.constraintsCoefficients.at(index).back() = value;
 }
 
-SimplexAlgorithm::SolveContext
-CanonicalAdapter::toCanonical(const CanonicalAdapter::SolveContext &context) {
-  SimplexAlgorithm::SolveContext result;
+CanonicalContext CanonicalAdapter::toCanonical(const SolveContext &context) {
+  CanonicalContext result;
 
   result.objectiveFunctionCoefficients = context.objectiveFunctionCoefficients;
 
-  if (context.type == CanonicalAdapter::OptimizationType::Min) {
+  if (context.type == OptimizationType::Min) {
     result.objectiveFunctionCoefficients =
         -1.0f * result.objectiveFunctionCoefficients;
   }

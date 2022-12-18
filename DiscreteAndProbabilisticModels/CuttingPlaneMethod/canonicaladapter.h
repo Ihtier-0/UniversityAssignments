@@ -4,42 +4,13 @@
 #include <functional>
 #include <memory>
 
+#include "canonicalsolver.h"
 #include "globals.h"
-#include "simplexalgorithm.h"
 
 class CanonicalAdapter;
 using CanonicalAdapterUniquePtr = std::unique_ptr<CanonicalAdapter>;
 
 class CanonicalAdapter {
-public:
-  enum class OptimizationType {
-    Unknown,
-    Max,
-    Min,
-  };
-
-  enum class Sign {
-    Unknown,
-    eq, // ==
-    ge, // >=
-    gt, // >
-    le, // <=
-    lt, // <
-    // ne, // !=
-  };
-
-  struct Constraint {
-    VectorCoefficients coefficients;
-    Sign sign = Sign::Unknown;
-    Real constants;
-  };
-
-  struct SolveContext {
-    OptimizationType type = OptimizationType::Unknown;
-    Vector<Constraint> constraints;
-    VectorCoefficients objectiveFunctionCoefficients;
-  };
-
 private:
   CanonicalAdapter() = delete;
   CanonicalAdapter(const CanonicalAdapter &) = delete;
@@ -48,22 +19,21 @@ private:
   CanonicalAdapter operator=(CanonicalAdapter &&) = delete;
 
   CanonicalAdapter(const SolveContext &context,
-                   SimplexAlgorithmUniquePtr simplex);
+                   CanonicalSolverUniquePtr solver);
 
 public:
-  static CanonicalAdapterUniquePtr create(const SolveContext &solveContext);
+  static CanonicalAdapterUniquePtr create(const SolveContext &context,
+                                          SolverCreator creator);
 
-  VectorCoefficients
-  calculate(const SimplexAlgorithm::CalculateCallback &сallback = {});
+  VectorCoefficients calculate(const CalculateCallback &сallback = {});
 
 private:
-  static SimplexAlgorithm::SolveContext
-  toCanonical(const CanonicalAdapter::SolveContext &context);
+  static CanonicalContext toCanonical(const SolveContext &context);
 
   VectorCoefficients fromCanonical(const VectorCoefficients &context);
 
   SolveContext mContext;
-  SimplexAlgorithmUniquePtr mSimplex;
+  CanonicalSolverUniquePtr mSolver;
 };
 
 #endif // CANONICALADAPTER_H

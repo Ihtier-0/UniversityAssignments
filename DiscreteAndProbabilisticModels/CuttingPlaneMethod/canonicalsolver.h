@@ -26,6 +26,8 @@ public:
   virtual VectorCoefficients
   calculate(const CalculateCallback &calculateCallback = {}) = 0;
 
+  constexpr static const Size invalidIndex = static_cast<Size>(-1); // shit
+
 protected:
   CanonicalContext mContext;
 };

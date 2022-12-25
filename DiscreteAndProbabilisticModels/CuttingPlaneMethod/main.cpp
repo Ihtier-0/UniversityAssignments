@@ -2,6 +2,7 @@
 
 #include "canonicaladapter.h"
 #include "coefficientsutils.h"
+#include "cuttingplanemethod.h"
 #include "globals.h"
 #include "simplexalgorithm.h"
 
@@ -15,22 +16,25 @@ int main() {
       //   - x1 + 3 * x2 +  0 + 4 * x4 <= 24
 
       SolveContext context;
-      context.objectiveFunctionCoefficients = {2.0f, 3.0f, 0.0f, -1.0f};
+      context.objectiveFunctionCoefficients = {
+          2.0f,
+          3.0f,
+          0.0f,
+          -1.0f,
+      };
       context.type = OptimizationType::Max;
 
-      // clang-format off
       context.constraints = {
-          {{ 2.0f, -1.0f,  0.0f, -2.0f}, Sign::le, 16},
-          {{ 3.0f,  2.0f,  1.0f, -3.0f}, Sign::eq, 18},
-          {{-1.0f,  3.0f,  0.0f,  4.0f}, Sign::le, 24}
+          {{2.0f, -1.0f, 0.0f, -2.0f}, Sign::le, 16},
+          {{3.0f, 2.0f, 1.0f, -3.0f}, Sign::eq, 18},
+          {{-1.0f, 3.0f, 0.0f, 4.0f}, Sign::le, 24},
       };
-      // clang-format on
 
       CanonicalAdapterUniquePtr simplex =
           CanonicalAdapter::create(context, SimplexAlgorithm::create);
 
       if (!simplex) {
-        return -1;
+        return EXIT_FAILURE;
       }
 
       VectorCoefficients answer = simplex->calculate(printCallback);
@@ -38,12 +42,60 @@ int main() {
       std::cout << "answer: " << answer << std::endl;
     }
 
-    return 0;
+    std::cout << std::endl;
+
+    {
+      // 1 * x1 + 2 * x2 -> max
+
+      // 3 * x1 + 4 * x2 + 1 * x3 + 0 * x4 -> max
+      // 3 * x1 + 6 * x2 + 0 * x3 + 1 * x4 -> max
+
+      CanonicalContext context;
+      context.objectiveFunctionCoefficients = {
+          1.0f,
+          2.0f,
+          0.0f,
+          0.0f,
+      };
+
+      context.constraintsCoefficients = {
+          {
+              3.0f,
+              4.0f,
+              1.0f,
+              0.0f,
+          },
+          {
+              5.0f,
+              6.0f,
+              0.0f,
+              1.0f,
+          },
+      };
+
+      context.constraintsConstants = {
+          7.0f,
+          8.0f,
+      };
+
+      CanonicalSolverUniquePtr simplex =
+          CuttingPlaneMethod::create(context, SimplexAlgorithm::create);
+
+      if (!simplex) {
+        return EXIT_FAILURE;
+      }
+
+      VectorCoefficients answer = simplex->calculate(printCallback);
+
+      std::cout << "answer: " << answer << std::endl;
+    }
+
+    return EXIT_SUCCESS;
   } catch (std::exception &exception) {
     std::cout << exception.what() << std::endl;
   } catch (...) {
     std::cout << "unknown exception" << std::endl;
   }
 
-  return -1;
+  return EXIT_FAILURE;
 }

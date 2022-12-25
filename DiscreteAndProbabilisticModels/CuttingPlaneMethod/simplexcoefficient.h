@@ -18,7 +18,7 @@ public:
   Real getB() const;
   void setB(Real B);
 
-  bool isM();
+  bool isM() const;
 
 private:
   Real mA = 0;

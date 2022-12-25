@@ -15,7 +15,7 @@ Real SimplexCoefficient::getB() const { return mB; }
 
 void SimplexCoefficient::setB(Real B) { mB = B; }
 
-bool SimplexCoefficient::isM() { return !fuzzyEquals(mB, 0); }
+bool SimplexCoefficient::isM() const { return !fuzzyEquals(mB, 0); }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// operators

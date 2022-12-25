@@ -23,7 +23,7 @@ public:
   static CanonicalSolverUniquePtr
   create(const CanonicalContext &canonicalContext);
 
-  virtual VectorCoefficients
+  virtual std::pair<EndType, VectorCoefficients>
   calculate(const CalculateCallback &calculateCallback = {}) override;
 
 private:
@@ -38,7 +38,6 @@ private:
 
   Real dotProductWithCol(const VectorCoefficients &vector, const Size &index);
 
-  enum EndType { End, NoEnd, Infinity };
   EndType getEndType(const VectorCoefficients &evaluation);
   bool negativeCol(const Size &index);
 

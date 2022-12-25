@@ -25,12 +25,14 @@ public:
   static CanonicalAdapterUniquePtr create(const SolveContext &context,
                                           SolverCreator creator);
 
-  VectorCoefficients calculate(const CalculateCallback &сallback = {});
+  std::pair<CanonicalSolver::EndType, VectorCoefficients>
+  calculate(const CalculateCallback &сallback = {});
 
 private:
   static CanonicalContext toCanonical(const SolveContext &context);
 
-  VectorCoefficients fromCanonical(const VectorCoefficients &context);
+  std::pair<CanonicalSolver::EndType, VectorCoefficients> fromCanonical(
+      const std::pair<CanonicalSolver::EndType, VectorCoefficients> &answer);
 
   SolveContext mContext;
   CanonicalSolverUniquePtr mSolver;

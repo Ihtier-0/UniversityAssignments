@@ -25,7 +25,7 @@ CanonicalAdapterUniquePtr CanonicalAdapter::create(const SolveContext &context,
   return result;
 }
 
-VectorCoefficients
+std::pair<CanonicalSolver::EndType, VectorCoefficients>
 CanonicalAdapter::calculate(const CalculateCallback &callback) {
   return fromCanonical(mSolver->calculate(callback));
 }
@@ -79,13 +79,17 @@ CanonicalContext CanonicalAdapter::toCanonical(const SolveContext &context) {
   return result;
 }
 
-VectorCoefficients
-CanonicalAdapter::fromCanonical(const VectorCoefficients &context) {
+std::pair<CanonicalSolver::EndType, VectorCoefficients>
+CanonicalAdapter::fromCanonical(
+    const std::pair<CanonicalSolver::EndType, VectorCoefficients> &answer) {
+  const auto context = answer.second;
+
   const Size cols = mContext.constraints.at(0).coefficients.size();
 
   VectorCoefficients result = context;
 
   result.resize(cols);
 
-  return result;
+  return std::pair<CanonicalSolver::EndType, VectorCoefficients>(answer.first,
+                                                                 result);
 }

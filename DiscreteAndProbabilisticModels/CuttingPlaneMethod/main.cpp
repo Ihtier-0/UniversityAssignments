@@ -8,6 +8,7 @@
 
 int main() {
   try {
+    // SimplexAlgorithm
     {
       // 2 * x1 + 3 * x2 + 0 * x3 - x4 -> max
 
@@ -37,13 +38,20 @@ int main() {
         return EXIT_FAILURE;
       }
 
-      VectorCoefficients answer = simplex->calculate(printCallback);
+      std::pair<CanonicalSolver::EndType, VectorCoefficients> answer =
+          simplex->calculate(printCallback);
 
-      std::cout << "answer: " << answer << std::endl;
+      if (answer.first == CanonicalSolver::End) {
+        std::cout << "answer: " << answer.second << std::endl;
+      } else {
+        std::cout << "answer: " << CanonicalSolver::toString(answer.first)
+                  << std::endl;
+      }
     }
 
     std::cout << std::endl;
 
+    // CuttingPlaneMethod
     {
       // 1 * x1 + 2 * x2 -> max
 
@@ -85,9 +93,15 @@ int main() {
         return EXIT_FAILURE;
       }
 
-      VectorCoefficients answer = simplex->calculate(printCallback);
+      std::pair<CanonicalSolver::EndType, VectorCoefficients> answer =
+          simplex->calculate(printCallback);
 
-      std::cout << "answer: " << answer << std::endl;
+      if (answer.first == CanonicalSolver::End) {
+        std::cout << "answer: " << answer.second << std::endl;
+      } else {
+        std::cout << "answer: " << CanonicalSolver::toString(answer.first)
+                  << std::endl;
+      }
     }
 
     return EXIT_SUCCESS;

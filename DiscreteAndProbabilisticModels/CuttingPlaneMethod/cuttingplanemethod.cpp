@@ -46,7 +46,7 @@ static void addConstraint(CanonicalContext &context, const Size &index) {
   context.objectiveFunctionCoefficients.push_back(0);
 }
 
-VectorCoefficients
+std::pair<CuttingPlaneMethod::EndType, VectorCoefficients>
 CuttingPlaneMethod::calculate(const CalculateCallback &callback) {
   CanonicalContext context = mContext;
 
@@ -57,19 +57,23 @@ CuttingPlaneMethod::calculate(const CalculateCallback &callback) {
       return {};
     }
 
-    VectorCoefficients result = solve->calculate(
+    std::pair<EndType, VectorCoefficients> result = solve->calculate(
         [&](const int &step, const CanonicalContext &canonicalContext) {
           callback(step, canonicalContext);
 
           context = canonicalContext;
         });
 
+    if (result.first != EndType::End) {
+      return result;
+    }
+
     bool allInt = true;
-    const Size size = result.size();
+    const Size size = result.second.size();
     Size index = invalidIndex;
 
     for (Size i = 0; allInt && i < size; ++i) {
-      if (!isInt(result[i])) {
+      if (!isInt(result.second[i])) {
         allInt = false;
         index = i;
       }

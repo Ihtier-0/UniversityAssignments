@@ -18,7 +18,7 @@ public:
   static CanonicalSolverUniquePtr create(const CanonicalContext &context,
                                          SolverCreator creator);
 
-  virtual VectorCoefficients
+  virtual std::pair<EndType, VectorCoefficients>
   calculate(const CalculateCallback &callback = {}) override;
 
 private:

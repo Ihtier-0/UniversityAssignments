@@ -20,10 +20,17 @@ using SolverCreator =
 
 class CanonicalSolver {
 public:
+  enum EndType {
+    End,
+    NoEnd,
+    Infinity,
+  };
+  static std::string toString(const EndType endType);
+
   CanonicalSolver(const CanonicalContext &context);
   virtual ~CanonicalSolver();
 
-  virtual VectorCoefficients
+  virtual std::pair<EndType, VectorCoefficients>
   calculate(const CalculateCallback &calculateCallback = {}) = 0;
 
   constexpr static const Size invalidIndex = static_cast<Size>(-1); // shit

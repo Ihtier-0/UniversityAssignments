@@ -23,7 +23,7 @@ SimplexAlgorithm::create(const CanonicalContext &context) {
   return result;
 }
 
-VectorCoefficients
+std::pair<SimplexAlgorithm::EndType, VectorCoefficients>
 SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
   int step = 0;
 
@@ -65,7 +65,10 @@ SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
     ++step;
   }
 
-  return end == EndType::End ? getAnswer() : VectorCoefficients();
+  return end == EndType::End
+             ? std::pair<EndType, VectorCoefficients>(end, getAnswer())
+             : std::pair<EndType, VectorCoefficients>(end, {});
+  ;
 }
 
 VectorIndices SimplexAlgorithm::findBasis() {

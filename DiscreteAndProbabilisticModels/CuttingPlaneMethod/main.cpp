@@ -10,11 +10,10 @@ int main() {
   try {
     // CuttingPlaneMethod
     {
-      // 2 * x1 + 4 * x2 - 8 * x3 -> max
+      // 1 * x1 + 2 * x2 -> max
 
-      // x1 + 3 * x2 - 9 * x3 >= 27
-      // x1 - 4 * x2 + 8 * x3 >= 12
-      // x1 + 1 * x2 + 1 * x3 >= 3
+      // 3 * x1 + 4 * x2 <= 7
+      // 5 * x1 + 6 * x2 <= 8
 
       SolveContext context;
       context.objectiveFunctionCoefficients = {

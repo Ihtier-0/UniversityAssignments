@@ -16,6 +16,9 @@ std::string CanonicalSolver::toString(const EndType endType) {
   case Infinity: {
     return "Infinity";
   }
+  case EmptySet: {
+    return "EmptySet";
+  }
   }
 
   return "";

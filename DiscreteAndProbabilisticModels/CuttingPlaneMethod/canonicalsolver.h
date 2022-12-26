@@ -24,6 +24,7 @@ public:
     End,
     NoEnd,
     Infinity,
+    EmptySet,
   };
   static std::string toString(const EndType endType);
 

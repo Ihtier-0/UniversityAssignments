@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "basiscalculator.h"
 #include "coefficientsutils.h"
 #include "fuzzycompare.h"
 
@@ -25,6 +26,25 @@ SimplexAlgorithm::create(const CanonicalContext &context) {
 
 std::pair<SimplexAlgorithm::EndType, VectorCoefficients>
 SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
+  const VectorIndices basis = findBasis();
+
+  if (basis.empty()) {
+    const auto basisCalculator = BasisCalculator::create(mContext);
+
+    if (!basisCalculator) {
+      return std::pair<EndType, VectorCoefficients>(SimplexAlgorithm::NoEnd,
+                                                    {});
+    }
+
+    const auto newContext = basisCalculator->calculate();
+
+    if (newContext.first != SimplexAlgorithm::End) {
+      return std::pair<EndType, VectorCoefficients>(newContext.first, {});
+    }
+
+    mContext = newContext.second;
+  }
+
   int step = 0;
 
   EndType end;
@@ -35,7 +55,8 @@ SimplexAlgorithm::calculate(const CalculateCallback &CalculateCallback) {
     const VectorIndices basis = findBasis();
 
     if (basis.empty()) {
-      return {};
+      return std::pair<SimplexAlgorithm::EndType, VectorCoefficients>(
+          SimplexAlgorithm::EndType::NoEnd, {});
     }
 
     // std::cout << "basis: " << basis << std::endl;
@@ -167,6 +188,7 @@ SimplexAlgorithm::EndType
 SimplexAlgorithm::getEndType(const VectorCoefficients &evaluation) {
   const Size size = evaluation.size();
 
+  // 1
   bool positive = true;
 
   for (Size i = 0; i < size && positive; ++i) {
@@ -179,6 +201,7 @@ SimplexAlgorithm::getEndType(const VectorCoefficients &evaluation) {
     return EndType::End;
   }
 
+  // 2
   for (Size i = 0; i < size; ++i) {
     if (evaluation[i] < 0 && negativeCol(i)) {
       return EndType::Infinity;

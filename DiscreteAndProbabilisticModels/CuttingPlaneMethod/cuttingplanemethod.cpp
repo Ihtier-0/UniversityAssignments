@@ -1,7 +1,24 @@
 #include "cuttingplanemethod.h"
 
 #include "fractpart.h"
+#include "fuzzycompare.h"
 #include "integerutils.h"
+
+static Size variableIndexToRowIndex(const CanonicalContext &context,
+                                    const Size &variableIndex) {
+  const Size rows = context.constraintsCoefficients.size();
+
+  for (Size i = 0; i < rows; ++i) {
+    if (fuzzyEquals(context.constraintsCoefficients.at(i).at(variableIndex),
+                    1.0f)) {
+      return i;
+    }
+  }
+
+  return CanonicalSolver::invalidIndex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 CuttingPlaneMethod::CuttingPlaneMethod(const CanonicalContext &context,
                                        SolverCreator creator)
@@ -23,20 +40,20 @@ CuttingPlaneMethod::create(const CanonicalContext &context,
   return result;
 }
 
-static void addConstraint(CanonicalContext &context, const Size &index) {
+static void addConstraint(CanonicalContext &context, const Size &row) {
   for (VectorCoefficients &coefficients : context.constraintsCoefficients) {
     coefficients.push_back(0);
   }
 
   context.constraintsConstants.push_back(
-      fractpart(context.constraintsConstants[index]));
+      fractpart(context.constraintsConstants[row]));
 
   const Size size = context.constraintsCoefficients[0].size();
 
   VectorCoefficients coefficients(size);
 
   for (Size i = 0; i < size; ++i) {
-    coefficients[i] = fractpart(context.constraintsCoefficients[index][i]);
+    coefficients[i] = fractpart(context.constraintsCoefficients[row][i]);
   }
 
   coefficients.back() = -1;
@@ -70,12 +87,12 @@ CuttingPlaneMethod::calculate(const CalculateCallback &callback) {
 
     bool allInt = true;
     const Size size = result.second.size();
-    Size index = invalidIndex;
+    Size variableIndex = invalidIndex;
 
     for (Size i = 0; allInt && i < size; ++i) {
       if (!isInt(result.second[i])) {
         allInt = false;
-        index = i;
+        variableIndex = i;
       }
     }
 
@@ -83,7 +100,7 @@ CuttingPlaneMethod::calculate(const CalculateCallback &callback) {
       return result;
     }
 
-    addConstraint(context, index);
+    addConstraint(context, variableIndexToRowIndex(context, variableIndex));
   }
 
   return {};

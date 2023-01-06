@@ -87,6 +87,50 @@ int main() {
       }
     }
 
+    std::cout << std::endl << std::endl;
+
+    // example 3
+    {
+      // 1 * x1 + 1 * x2 -> max
+
+      // x >= 0.2
+      // x <= 0.8
+      // y >= 0.2
+      // y <= 0.8
+
+      SolveContext context;
+      context.objectiveFunctionCoefficients = {
+          1.0f,
+          1.0f,
+      };
+      context.type = OptimizationType::Max;
+
+      context.constraints = {
+          {{1.0f, 0.0f}, Sign::ge, 0.2f},
+          {{1.0f, 0.0f}, Sign::le, 0.8f},
+          {{0.0f, 1.0f}, Sign::ge, 0.2f},
+          {{0.0f, 1.0f}, Sign::le, 0.8f},
+      };
+
+      CanonicalAdapterUniquePtr simplex = CanonicalAdapter::create(
+          context, std::bind(CuttingPlaneMethod::create, std::placeholders::_1,
+                             SimplexAlgorithm::create));
+
+      if (!simplex) {
+        return EXIT_FAILURE;
+      }
+
+      std::pair<CanonicalSolver::EndType, VectorCoefficients> answer =
+          simplex->calculate(printCallback);
+
+      if (answer.first == CanonicalSolver::End) {
+        std::cout << "answer: " << answer.second << std::endl;
+      } else {
+        std::cout << "answer: " << CanonicalSolver::toString(answer.first)
+                  << std::endl;
+      }
+    }
+
     return EXIT_SUCCESS;
   } catch (std::exception &exception) {
     std::cout << exception.what() << std::endl;

@@ -1,1 +1,0 @@
-dataset from: https://www.kaggle.com/datasets/aditya2803/one-piece-anime/

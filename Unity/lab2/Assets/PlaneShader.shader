@@ -8,7 +8,7 @@ Shader "Custom/PlaneShader"
     {
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_NormalMap("Normal Map (RGB)", 2D) = "white" {}
+        _NormalMap("Normal Map (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 
@@ -19,7 +19,7 @@ Shader "Custom/PlaneShader"
  
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" }
         LOD 200
 
         CGPROGRAM
@@ -34,12 +34,13 @@ Shader "Custom/PlaneShader"
 
         struct Input
         {
-            float2 uv_MainTex;
-            float2 uv_NormalMap;
+            fixed2 uv_MainTex;
+            fixed2 uv_NormalMap;
 
-            float3 normal : NORMAL;
-            float3 tangent : TANGENT;
-            float4 pos : SV_POSITION;
+            fixed4 pos : SV_POSITION;
+
+            fixed3 normal : NORMAL;
+            fixed3 tangent : TANGENT;
         };
 
         half _Glossiness;
@@ -63,6 +64,15 @@ Shader "Custom/PlaneShader"
             return _WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, v).xyz;
         }
 
+        fixed3 unpack_normal(sampler2D map, fixed2 uv)
+        {
+            fixed4 packed = tex2D(map, uv);
+            fixed4 unpacked = 2 * packed - 1;
+            // common convention for normal maps is to store the up direction in the Z component
+            // in Unity Y - up
+            return normalize(unpacked.xzy);
+        }
+
         fixed4 phong(Input IN)
         {
             // light
@@ -73,33 +83,29 @@ Shader "Custom/PlaneShader"
             fixed4 ambient = _ambient_strength * light_color;
 
             // diffuse
-            float3 n = normalize(IN.normal);
-            float diff = max(dot(n, light_dir), 0.0);
-            fixed4 diffuse = diff * light_color;
+            fixed3 n = unpack_normal(_NormalMap, IN.uv_NormalMap);
+            float d = max(dot(n, light_dir), 0.0);
+            fixed4 diffuse = d * light_color;
 
             // specular
             fixed3 view_dir = normalize(world_space_view_dir(IN.pos));
             fixed3 reflect_dir = reflect(-light_dir, n);
-            float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
-            fixed4 specular = _specular_strength * spec * light_color;
+            float s = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
+            fixed4 specular = _specular_strength * s * light_color;
 
             // object color
-            fixed4 albedo = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+            fixed4 albedo = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 
-            return (ambient + diffuse + specular) * albedo;
-        }
-
-        float3 unpack_normal(float3 packed)
-        {
-            return normalize(2 * packed - 1);
+            return (ambient + specular + diffuse) * albedo;
         }
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             // Albedo comes from a texture tinted by color
-            fixed4 albedo = tex2D (_MainTex, IN.uv_MainTex) * _Color; // phong(IN)
-            o.Albedo = albedo.rgb;
-            o.Alpha = albedo.a;
+            fixed4 p = phong(IN);
+            o.Albedo = p.rgb;
+            o.Alpha = p.a;
+
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;

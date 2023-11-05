@@ -33,20 +33,20 @@
 
 \title
 {
-	Равномерное распределение точек на сфере
+    Равномерное распределение точек на сфере
 }
 \author
 {
-	И.Б.Рахимов\thanks{Автор оригинальной статии Мартин Робертс} \\
-	студент 2-го курса Магистратуры  \\
-	кафедры Вычислительной математики и \\
-	прикладных информационных технологий \\
-	факультета Прикладной математики, информатики и механики \\
-	Воронежского Государственного Университета
+    И.Б.Рахимов\thanks{Автор оригинальной статии Мартин Робертс} \\
+    студент 2-го курса Магистратуры  \\
+    кафедры Вычислительной математики и \\
+    прикладных информационных технологий \\
+    факультета Прикладной математики, информатики и механики \\
+    Воронежского Государственного Университета
 }
 \date
 {
-	\today
+    \today
 }
 
 \begin{document}
@@ -76,10 +76,10 @@
 К сожалению, за исключением нескольких особых случаев (а именно платоновых тел) невозможно идеально ровно распределить точки на сфере. Кроме того, решение задачи сильно зависит от критерия, который используется для оценки однородности. На практике используется множество критериев, в том числе:
 
 \begin{itemize}
-	\item Упаковка и покрытие \cite{alaxandrow_2009};
-	\item Выпуклые оболочки, ячейки Вороного и треугольники Делоне \cite{alaxandrow_2009, berg_2016};
-	\item Ядра $s$-энергии Риса \cite{alaxandrow_2009, berg_2016, demidovich_2019};
-	\item Кубатура и определители \cite{alaxandrow_2009, demidovich_2019}.
+    \item Упаковка и покрытие \cite{alaxandrow_2009};
+    \item Выпуклые оболочки, ячейки Вороного и треугольники Делоне \cite{alaxandrow_2009, berg_2016};
+    \item Ядра $s$-энергии Риса \cite{alaxandrow_2009, berg_2016, demidovich_2019};
+    \item Кубатура и определители \cite{alaxandrow_2009, demidovich_2019}.
 \end{itemize}
 
 Очень важно уяснить этот аспект: обычно не существует единственного оптимального решения этой задачи, потому что оптимальное решение, основанное на одном критерии, часто не является оптимальным распределением точек для других. Например, мы также выясним, что оптимизация упаковки необязательно создаёт оптимальную выпуклую оболочку и наоборот.
@@ -95,15 +95,15 @@
 Часто эту задачу называют задачей Тэммса в честь ботаника Тэммса, искавшего объяснение структуры поверхности пыльцевых зёрен. Критерий упаковки требует от нас максимизировать наименьшее расстояние между соседями для $N$ точек. То есть:
 
 \begin{displaymath}
-	d_N = \min_{i \neq j} \Vert x_i - x_j \Vert _2,
+    d_N = \min_{i \neq j} \Vert x_i - x_j \Vert _2,
 \end{displaymath}
 
 \noindent это значение уменьшается со скоростью $\dfrac{1}{\sqrt{N}}$, поэтому полезно будет определить нормализованное расстояние, а также асимптотический предел нормализованного расстояния как:
 
 \begin{displaymath}
-	d^*_N = \sqrt{N} d_N,
-	\qquad
-	d^* = \lim_{N \rightarrow \infty} d^*_N.
+    d^*_N = \sqrt{N} d_N,
+    \qquad
+    d^* = \lim_{N \rightarrow \infty} d^*_N.
 \end{displaymath}
 
 \subsection{Сетка Фибоначчи}
@@ -111,48 +111,48 @@
 Одно очень элегантное решение моделирует узлы, встречающиеся в природе, это явление называется спиральным филлотаксисом. Коксетер показал, что такие структуры имеют фундаментальную связь с рядом Фибоначчи:
 
 \begin{displaymath}
-	F_k = \{1, 1, 2, 3, 5, 8, 13, \ldots \}
+    F_k = \{1, 1, 2, 3, 5, 8, 13, \ldots \}
 \end{displaymath}
 
 \noindent и золотым сечением:
 
 \begin{displaymath}
-	\phi = \frac{1 + \sqrt{5}}{2}.
+    \phi = \frac{1 + \sqrt{5}}{2}.
 \end{displaymath}
 
 В литературе встречается два схожих определения множества точек сферической сетки Фибоначчи. Исходное определено строго для $N$, равного одному из членов ряда Фибоначчи, $F_m$, и хорошо изучено в теории чисел:
 
 \begin{displaymath}
-	t_i = \left( \frac{i}{F_m}, \frac{i \cdot F_{m-1}}{F_m} \right),
-	\qquad
-	0 \leq i \leq N-1.
+    t_i = \left( \frac{i}{F_m}, \frac{i \cdot F_{m-1}}{F_m} \right),
+    \qquad
+    0 \leq i \leq N-1.
 \end{displaymath}
 
 Второе определение, при котором $d^* = 2$, обобщает формулу до произвольного количества $N$ и используется в вычислениях чаще:
 
 \begin{displaymath}
-	t_i = \left( \frac{i}{N}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1,
-	\tag{1}
+    t_i = \left( \frac{i}{N}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1,
+    \tag{1}
 \end{displaymath}
 
 \begin{displaymath}
-	\phi = \frac{1 + \sqrt{5}}{2} = \lim_{n \rightarrow \infty} \left( \frac{F_{n+1}}{F_n} \right).
+    \phi = \frac{1 + \sqrt{5}}{2} = \lim_{n \rightarrow \infty} \left( \frac{F_{n+1}}{F_n} \right).
 \end{displaymath}
 
 Ниже показан пример таки сеток Фибоначчи. Преобразованием можно превратить эти множества точек в хорошо известные нам спирали Фибоначчи:
 
 \begin{displaymath}
-	(r, \theta) = (\sqrt{x_1}, 2 \pi x_2).
+    (r, \theta) = (\sqrt{x_1}, 2 \pi x_2).
 \end{displaymath}
 
-% h	Place the float here, i.e., approximately at the same point it occurs in the source text (however, not exactly at the spot)
-% t	Position at the top of the page.
-% b	Position at the bottom of the page.
-% p	Put on a special page for floats only.
-% !	Override internal parameters LaTeX uses for determining "good" float positions.
-% H	Places the float at precisely the location in the LaTeX code. Requires the float package (\usepackage{float}). This is somewhat equivalent to h!.
+% h    Place the float here, i.e., approximately at the same point it occurs in the source text (however, not exactly at the spot)
+% t    Position at the top of the page.
+% b    Position at the bottom of the page.
+% p    Put on a special page for floats only.
+% !    Override internal parameters LaTeX uses for determining "good" float positions.
+% H    Places the float at precisely the location in the LaTeX code. Requires the float package (\usepackage{float}). This is somewhat equivalent to h!.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/1.png}
@@ -164,11 +164,11 @@
 Аналогичным образом эти множества точек можно перенести из единичного квадрата $[0, 1]^2$ на сферу при помощи цилиндрической равновеликой проекции:
 
 \begin{displaymath}
-	(x,y) \rightarrow (\theta, \phi) : \quad \left( \cos^{-1}(2x-1) - \frac{\pi}{2}, 2\pi y \right),
+    (x,y) \rightarrow (\theta, \phi) : \quad \left( \cos^{-1}(2x-1) - \frac{\pi}{2}, 2\pi y \right),
 \end{displaymath}
 
 \begin{displaymath}
-	(\theta,\phi) \rightarrow (x,y,z) : \quad \left (\cos\theta \cos\phi, \cos \theta \sin \phi, \sin \theta \right).
+    (\theta,\phi) \rightarrow (x,y,z) : \quad \left (\cos\theta \cos\phi, \cos \theta \sin \phi, \sin \theta \right).
 \end{displaymath}
 
 Вот базовая реализация этого в Python:
@@ -201,24 +201,24 @@ z = cos(phi);
 Более распространённая версия (особенно в компьютерных системах), создающая более хорошее значение $d^*=3.09$, имеет вид:
 
 \begin{displaymath}
-	t_i = \left( \frac{i + 0.5}{N}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1.
-	\tag{2}
+    t_i = \left( \frac{i + 0.5}{N}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1.
+    \tag{2}
 \end{displaymath}
 
 Она располагает точки в средних точках интервалах (по правилу средней точки в квадратной формуле Гаусса), поэтому для $n=100$, значения первой координаты будут такими:
 
 \begin{displaymath}
-	\{
-		\frac{0.5}{100},
-		\frac{1.5}{100},
-		\frac{2.5}{100},
-		\ldots,
-		\frac{97.5}{100},
-		\frac{98.5}{100},
-		\frac{99.5}{100}
-	\}.
+    \{
+        \frac{0.5}{100},
+        \frac{1.5}{100},
+        \frac{2.5}{100},
+        \ldots,
+        \frac{97.5}{100},
+        \frac{98.5}{100},
+        \frac{99.5}{100}
+    \}.
 \end{displaymath}
 
 \subsubsection*{Сетка 2}
@@ -229,32 +229,32 @@ z = cos(phi);
 Если мы определим следующее распределение:
 
 \begin{displaymath}
-	t_i = \left( \frac{i + \varepsilon}{N - 1 + 2 \varepsilon}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1,
+    t_i = \left( \frac{i + \varepsilon}{N - 1 + 2 \varepsilon}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1,
 \end{displaymath}
 
 \noindent $d^*_N$ — кривые для различных значений. $\varepsilon=0$ (синяя); $\varepsilon=\dfrac{1}{2}$ (оранжевая); $\varepsilon=\dfrac{3}{2}$ (зелёная); и $\varepsilon=\dfrac{5}{2}$ (красная). Можно увидеть, что $\varepsilon = \dfrac{5}{2}$ даёт результаты ближе к асимптотическим результатам. То есть при $N>20$ следующее простое выражение генерирует значительно более хорошие результаты $d^* = 3.29$ по сравнению с канонической сферической сеткой Фибоначчи:
 
 \begin{displaymath}
-	t_i = \left( \frac{i + 1.5}{N + 3}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1.
-	\tag{3}
+    t_i = \left( \frac{i + 1.5}{N + 3}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1.
+    \tag{3}
 \end{displaymath}
 
 То есть при $N=100$ значения первой координаты будут равны:
 
 \begin{displaymath}
-	\{
-		\frac{1.5}{103},
-		\frac{2.5}{103},
-		\frac{3.5}{103},
-		\ldots,
-		\frac{98.5}{103},
-		\frac{99.5}{103},
-		\frac{100.5}{103}
-	\}.
+    \{
+        \frac{1.5}{103},
+        \frac{2.5}{103},
+        \frac{3.5}{103},
+        \ldots,
+        \frac{98.5}{103},
+        \frac{99.5}{103},
+        \frac{100.5}{103}
+    \}.
 \end{displaymath}
 
 \begin{figure}[H]
@@ -275,14 +275,14 @@ z = cos(phi);
 То есть:
 
 \begin{displaymath}
-	t_0 = (0, 0),
-	\qquad
-	t_{N-1} = (1, 0),
-	\qquad
-	t_i = \left( \frac{i + 3.5}{N + 6}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1.
-	\tag{3}
+    t_0 = (0, 0),
+    \qquad
+    t_{N-1} = (1, 0),
+    \qquad
+    t_i = \left( \frac{i + 3.5}{N + 6}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1.
+    \tag{3}
 \end{displaymath}
 
 Удивительное свойство этого метода построения заключается в том, что несмотря на то, что его создание было мотивировано желанием минимизировать пустоты на полюсах, он на самом деле имеет наилучшее среди всех методов значение $d_N$ и $d^*$ с $d^* = 3.31$.
@@ -290,17 +290,17 @@ z = cos(phi);
 То есть при $N=100$ значения первой координаты будут такими:
 
 \begin{displaymath}
-	\{
-		0,
-		\frac{3.5}{106},
-		\frac{4.5}{106},
-		\frac{5.5}{106},
-		\ldots,
-		\frac{99.5}{106},
-		\frac{100.5}{106},
-		\frac{101.5}{106},
-		1
-	\}.
+    \{
+        0,
+        \frac{3.5}{106},
+        \frac{4.5}{106},
+        \frac{5.5}{106},
+        \ldots,
+        \frac{99.5}{106},
+        \frac{100.5}{106},
+        \frac{101.5}{106},
+        1
+    \}.
 \end{displaymath}
 
 \begin{figure}[H]
@@ -375,14 +375,14 @@ Log Energy & 3.37 \\
 Сетка 3, созданная по уравнению 3, является модификацией канонической сетки Фибоначчи, обеспечивающей гораздо более качественную упаковку распределения точек. То есть:
 
 \begin{displaymath}
-	t_0 = (0, 0),
-	\qquad
-	t_{N-1} = (0, 1),
-	\qquad
-	t_i = \left( \frac{i + 6}{N + 11}, \frac{i}{\phi} \right),
-	\qquad
-	0 \leq i \leq N-1.
-	\tag{3}
+    t_0 = (0, 0),
+    \qquad
+    t_{N-1} = (0, 1),
+    \qquad
+    t_i = \left( \frac{i + 6}{N + 11}, \frac{i}{\phi} \right),
+    \qquad
+    0 \leq i \leq N-1.
+    \tag{3}
 \end{displaymath}
 
 \newpage
@@ -394,7 +394,7 @@ Log Energy & 3.37 \\
 Обозначим $\epsilon_N$ как выпуклую оболочку $N$ точек:
 
 \begin{displaymath}
-	\epsilon_N = N \left( \frac{4 \pi}{3} - Vol(C_N) \right),
+    \epsilon_N = N \left( \frac{4 \pi}{3} - Vol(C_N) \right),
 \end{displaymath}
 
 \noindent сюда включён фактор нормализации $N$, потому что абсолютное расхождение снижается со скоростью $\frac{1}{N}$.
@@ -406,30 +406,30 @@ Log Energy & 3.37 \\
 Давайте обобщим уравнение 1 следующим образом:
 
 \begin{displaymath}
-	t_i = \left( \frac{i+1/2}{N}, \frac{i}{g(N)} \right), \qquad 0 \leq i \leq N-1,
-	\tag{4}
+    t_i = \left( \frac{i+1/2}{N}, \frac{i}{g(N)} \right), \qquad 0 \leq i \leq N-1,
+    \tag{4}
 \end{displaymath}
 
 \noindent где определим $g(n)$ как:
 
 \begin{displaymath}
-	g(n) =
-		\begin{cases}
-			3-\phi, & \text{если $k$ чётное} \\
-			\phi, & \text{если $k$ нечетное}
-		\end{cases},
-	\tag{5}
+    g(n) =
+        \begin{cases}
+            3-\phi, & \text{если $k$ чётное} \\
+            \phi, & \text{если $k$ нечетное}
+        \end{cases},
+    \tag{5}
 \end{displaymath}
 
 \begin{displaymath}
-	k =
-		\left\lfloor
-			\log_{\phi}(\frac{n}{1.5})
-		\right\rfloor
-	  =
-		\left\lfloor
-			\frac{\ln (n/1.5)}{\ln \phi }
-		\right\rfloor,
+    k =
+        \left\lfloor
+            \log_{\phi}(\frac{n}{1.5})
+        \right\rfloor
+      =
+        \left\lfloor
+            \frac{\ln (n/1.5)}{\ln \phi }
+        \right\rfloor,
 \end{displaymath}
 
 \noindent где $\lfloor x \rfloor$ — функция округления до ближайшего целого в меньшую сторону.
@@ -437,13 +437,13 @@ Log Energy & 3.37 \\
 Причина этого заключается в следующем факте: все числа $x$, удовлетворяющие особому преобразованию Мёбиуса, исходя из иррациональности эквивалентны $\phi$:
 
 \begin{displaymath}
-	x = \frac{a\phi+b}{c\phi+d}, \qquad \textrm{для всех } a,b,c,d, |ad-bc|=1.
+    x = \frac{a\phi+b}{c\phi+d}, \qquad \textrm{для всех } a,b,c,d, |ad-bc|=1.
 \end{displaymath}
 
 Следовательно, причина того, что $\phi$ и $3-\phi$ так хорошо подходят друг другу, заключается в том, что:
 
 \begin{displaymath}
-	\frac{1}{\phi} = \frac{\phi+1}{2\phi+1}, \qquad \frac{1}{3-\phi}= \frac{2\phi+1}{1\phi+1}.
+    \frac{1}{\phi} = \frac{\phi+1}{2\phi+1}, \qquad \frac{1}{3-\phi}= \frac{2\phi+1}{1\phi+1}.
 \end{displaymath}
 
 \begin{figure}[H]
@@ -455,13 +455,13 @@ Log Energy & 3.37 \\
 Для оставшейся половины мы сначала определим вспомогательный ряд $A_N$, являющийся разновидностью ряда Фибоначчи:
 
 \begin{displaymath}
-	A_1 =1, A_2 = 4, A_{n+2}= A_{n+1}+A_n \textrm{ для } n = 1,2,3, \ldots,
+    A_1 =1, A_2 = 4, A_{n+2}= A_{n+1}+A_n \textrm{ для } n = 1,2,3, \ldots,
 \end{displaymath}
 
 \noindent то есть:
 
 \begin{displaymath}
-	A_N = 1,4,5,9,14,23,37,60,97,157,254,411, \ldots.
+    A_N = 1,4,5,9,14,23,37,60,97,157,254,411, \ldots.
 \end{displaymath}
 
 \newpage
@@ -469,18 +469,18 @@ Log Energy & 3.37 \\
 Все дроби этого ряда имеют изящные непрерывные дроби, а в пределе сходятся к $\phi$. Например:
 
 \begin{displaymath}
-	\frac{t_5}{t_4} = 1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{ 1 + \cfrac{1}{4}}}}.
+    \frac{t_5}{t_4} = 1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{ 1 + \cfrac{1}{4}}}}.
 \end{displaymath}
 
 Теперь мы можем полностью обобщить $g(n)$ следующим образом:
 
 \begin{displaymath}
-	g(N) =
-		\begin{cases}
-			3-\phi, & \text{если $k$ четное} \\
-			\dfrac{A_{j+1}}{A_j} , & \text{если $k$ нечетное, $j=\dfrac{k+7}{2}$}
- 		\end{cases}.
-	\tag{6}
+    g(N) =
+        \begin{cases}
+            3-\phi, & \text{если $k$ четное} \\
+            \dfrac{A_{j+1}}{A_j} , & \text{если $k$ нечетное, $j=\dfrac{k+7}{2}$}
+         \end{cases}.
+    \tag{6}
 \end{displaymath}
 
 \begin{table}[H]

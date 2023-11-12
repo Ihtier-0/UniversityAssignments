@@ -52,8 +52,8 @@ class Recognizer:
         dataset = CancerDataset(dataset_path)
         columnCount = dataset.dataShape()[1]
 
-        self.model = MultilayerPerceptrone(columnCount, 1).to(self.device)
         self.dl = torch.utils.data.DataLoader(dataset, batch_size = 32, shuffle = True)
+        self.model = MultilayerPerceptrone(columnCount, 1).to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters())
         self.loss_fn = nn.BCELoss()
 

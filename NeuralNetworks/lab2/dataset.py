@@ -9,12 +9,6 @@ class CancerDataset(torch.utils.data.Dataset):
 
         self.csv = pd.read_csv(path)
 
-        # The diagnosis of breast tissues (M = malignant, B = benign)
-        #     malignant - злокачественный
-        #     benign - доброкачественный
-        d = { 'M':0, 'B':1 }
-        self.csv.diagnosis = self.csv.diagnosis.map(d)
-
         # axis {0 or ‘index’, 1 or ‘columns’}, default 0
         #     Whether to drop labels from the index (0 or ‘index’) or columns (1 or ‘columns’).
         self.x = self.csv.drop(["diagnosis"], axis = 1)
@@ -35,6 +29,11 @@ class CancerDataset(torch.utils.data.Dataset):
         # Normalization
         self.x = (self.x - np.min(self.x)) / (np.max(self.x) - np.min(self.x))
 
+        # The diagnosis of breast tissues (M = malignant, B = benign)
+        #     malignant - злокачественный
+        #     benign - доброкачественный
+        d = { 'M':0, 'B':1 }
+        self.csv.diagnosis = self.csv.diagnosis.map(d)
         self.y = self.csv.diagnosis.values
 
     def dataShape(self):

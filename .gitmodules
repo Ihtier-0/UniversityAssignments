@@ -1,6 +1,3 @@
-[submodule "NeuralNetworks/lab3"]
-	path = NeuralNetworks/lab3
-	url = https://github.com/khornonzon/ImageClassifier.git
 [submodule "NeuralNetworks/lab1"]
 	path = NeuralNetworks/lab1
 	url = https://github.com/Ihtier-0/rosenblatts_perceptron

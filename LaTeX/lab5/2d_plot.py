@@ -44,13 +44,13 @@ dislin.digits (-1, 'XY') # количество знаков после запя
 dislin.titlin ('limacon', 1)
 dislin.titlin ('(2 * R * cos(t) - h * cos(2 * t), 2 * R * sin(t) - h * sin(2 * t))', 2)
 dislin.titlin ("R = {0}, h = {1}".format(R, h), 3)
- 
+
 dislin.graf   (-5.0, 5.0, # нижний и верхний пределы оси X
                -5.0, 1.0, # первая метка оси X и шаг между метками
                -5.0, 5.0, # нижний и верхний пределы оси Y
                -5.0, 1.0) # первая метка оси Y и шаг между метками
 dislin.title  () # вывод заголовка
-    
+
 # вывод красного графика
 dislin.color  ('red')
 dislin.curve  (x, y, n)

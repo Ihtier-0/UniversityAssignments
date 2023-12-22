@@ -43,7 +43,7 @@ class Network:
                 ),
                 tf.keras.layers.MaxPooling2D(2, 2),
 
-                tf.keras.layers.Flatten(), # вытягивает матрицу в вектор
+                tf.keras.layers.Flatten(), # матрицу в вектор
 
                 tf.keras.layers.Dense(
                     128,
@@ -71,9 +71,9 @@ class Network:
         history = self.model.fit(
             self.data.train_images,
             self.data.train_labels,
-            
+
             epochs = e,
-            
+
             validation_data = (self.data.test_images, self.data.test_labels)
         )
 

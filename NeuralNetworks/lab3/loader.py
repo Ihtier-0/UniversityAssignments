@@ -25,10 +25,10 @@ def load(path):
             image = cv2.imread(image_path)
             image = cv2.resize(image, image_size)
             image = image / 255.0
-            
+
             images.append(image)
             labels.append(index)
-            
+
     images = np.array(images)
     labels = np.array(labels)
 

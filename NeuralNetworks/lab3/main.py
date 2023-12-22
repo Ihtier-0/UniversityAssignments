@@ -34,7 +34,7 @@ import cv2
 labels_name = ['buildings', 'forest', 'glacier', 'mountain', 'sea', 'street']
 image_size = (150, 150)
 
-image = cv2.imread("C:\\Users\\Ihtie\\company\\ihtier\\UniversityAssignments\\NeuralNetworks\\lab3\\test\\forest\\20089.jpg")
+image = cv2.imread("C:\\Users\\Ihtie\\company\\ihtier\\UniversityAssignments\\NeuralNetworks\\lab3\\test\\mountain\\20085.jpg")
 image = cv2.resize(image, image_size)
 image = image / 255.0
 

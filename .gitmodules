@@ -1,6 +1,0 @@
-[submodule "NeuralNetworks/lab1"]
-	path = NeuralNetworks/lab1
-	url = https://github.com/Ihtier-0/rosenblatts_perceptron
-[submodule "NumericalAnalysis"]
-	path = NumericalAnalysis
-	url = git@github.com:Ihtier-0/NumericalAnalysis.git

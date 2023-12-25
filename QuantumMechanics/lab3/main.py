@@ -1,9 +1,6 @@
 import matplotlib.pyplot as plt
-from math import sqrt
-
-################################################################################
-### shooting begin
-################################################################################
+from math import sqrt, cos, sin, pi
+from numpy import linalg as LA
 
 ################################################################################
 ### bisection_method
@@ -49,29 +46,13 @@ def v(x:float) -> float:
     else:
         return w
 
-# Потенциальная функция невозмущенной системы
+#  потенциальная функция
 def U(x:float) -> float:
     return v0 * v(x)
 
-# Потенциальная функция возмущенной системы
-def U1(x:float) -> float:
-    if (x > (-half_width / 2 + half_width / 5) and x < (-half_width / 5)):
-        return U(x) + 0.5
-    else:
-        return U(x)
-
-# возмущение
-def V(x:float):
-    return U(x) - U1(x)
-
-def U_pr(x:float):
-    return U(x) + V(x)
-
-SOLVE_U = U
-
 def q(e:float,
       x:float) -> float:
-    return 2.0 * (e - SOLVE_U(x))
+    return 2.0 * (e - U(x))
 
 def compute_q(x:list[float],
               energy:float) -> list[float]:
@@ -272,8 +253,6 @@ print(f"v0 = {v0} атомных единиц")
 print(f"l = {half_width} атомных единиц")
 
 def main():
-    global SOLVE_U
-
     min_energy = -v0
     print("Минимальное значение потенциальной функции = {}".format(min_energy))
     print()
@@ -296,69 +275,6 @@ def main():
     max_energy_value = 1000
     max_energy_count = 2
 
-    bisection_method_steps = 100
-    bisection_method_eps = 0.0001
-
-################################################################################
-### shooting perturbation
-################################################################################
-
-    SOLVE_U = U1
-
-    intervals_pr = eigen_value_intervals(min_energy,
-                                         energy_step,
-                                         max_energy_value,
-                                         max_energy_count,
-                                         x,
-                                         step,
-                                         forward_first_approximation,
-                                         backward_penultimate_approximation,
-                                         connection)
-    print("intervals_pr: ", intervals_pr)
-
-    energies_pr = []
-    level_pr = 0
-    f_pr = lambda e : is_close_energy(e,
-                                      x,
-                                      step,
-                                      forward_sign * forward_first_approximation,
-                                      backward_penultimate_approximation,
-                                      connection)
-    for i in range(max_energy_count):
-        l = intervals_pr[2 * i]
-        r = intervals_pr[2 * i + 1]
-        forward_sign = (1 if level_pr % 2 == 0 else -1)
-        energy = bisection_method(
-            f_pr,
-            l, r,
-            bisection_method_steps,
-            bisection_method_eps)
-        energies_pr.append(energy)
-
-        level_pr += 1
-    print("energies_pr: ", energies_pr, " a.u.")
-    print()
-
-    q_n0_pr = compute_q(x, energies_pr[0])
-    forward_n0_pr = forward_integration(num_intervals, forward_first_approximation, q_n0_pr, step)
-    backward_n0_pr = backward_integration(num_intervals, backward_penultimate_approximation, q_n0_pr, step)
-    forward_n0_pr, backward_n0_pr = normalization(forward_n0_pr, backward_n0_pr, connection)
-    forward_n0_pr = quantum_normalize(forward_n0_pr, step)
-    backward_n0_pr = quantum_normalize(backward_n0_pr, step)
-
-    q_n1_pr = compute_q(x, energies_pr[1])
-    forward_n1_pr = forward_integration(num_intervals, forward_first_approximation, q_n1_pr, step)
-    backward_n1_pr = backward_integration(num_intervals, backward_penultimate_approximation, q_n1_pr, step)
-    forward_n1_pr, backward_n1_pr = normalization(forward_n1_pr, backward_n1_pr, connection)
-    forward_n1_pr = quantum_normalize(forward_n1_pr, step)
-    backward_n1_pr = quantum_normalize(backward_n1_pr, step)
-
-################################################################################
-### shooting idealized
-################################################################################
-
-    SOLVE_U = U
-
     intervals = eigen_value_intervals(min_energy,
                                       energy_step,
                                       max_energy_value,
@@ -369,6 +285,9 @@ def main():
                                       backward_penultimate_approximation,
                                       connection)
     print("intervals: ", intervals)
+
+    bisection_method_steps = 100
+    bisection_method_eps = 0.0001
 
     energies = []
     level = 0
@@ -393,6 +312,9 @@ def main():
     print("energies: ", energies, " a.u.")
     print()
 
+    # значения для построения графиков
+    u = [U(xi) for xi in x]
+
     q_n0 = compute_q(x, energies[0])
     forward_n0 = forward_integration(num_intervals, forward_first_approximation, q_n0, step)
     backward_n0 = backward_integration(num_intervals, backward_penultimate_approximation, q_n0, step)
@@ -400,109 +322,76 @@ def main():
     forward_n0 = quantum_normalize(forward_n0, step)
     backward_n0 = quantum_normalize(backward_n0, step)
 
-    q_n1 = compute_q(x, energies[1])
-    forward_n1 = forward_integration(num_intervals, forward_first_approximation, q_n1, step)
-    backward_n1 = backward_integration(num_intervals, backward_penultimate_approximation, q_n1, step)
-    forward_n1, backward_n1 = normalization(forward_n1, backward_n1, connection)
-    forward_n1 = quantum_normalize(forward_n1, step)
-    backward_n1 = quantum_normalize(backward_n1, step)
+    def phi(k:int, x:list[float]):
+        num_points  = len(x)
+        out = [float] * num_points
 
-################################################################################
-### shooting end
-################################################################################
+        denominator = 1.0 / sqrt(half_width)
 
-################################################################################
-### perturbation begin
-################################################################################
+        for i in range(num_points):
+            arg = (pi * (k + 1) * x[i]) / (2.0 * half_width)
 
-    # энергии
-    # energies
+            if k % 2:
+                out[i] = denominator * sin(arg)
+            else:
+                out[i] = denominator * cos(arg)
 
-    # волновые функциий
-    wave = [forward_n0, forward_n1]
+        return out
 
-    # Потенциальная функция невозмущенной системы
-    U0 = U
+    def Hphi(k:int, x:list[float]):
+        num_points  = len(x)
+        out = [float] * num_points
 
-    # Потенциальная функция возмущенной системы
-    # U1
+        phi_k = phi(k, x)
+        derivation = second_derivation(phi_k, step)
 
-    # возмущение
-    # V
+        for i in range(num_points):
+            out[i] = -0.5 * derivation[i] + u[i] * phi_k[i]
 
-    def matrix_V(n:int, m:int):
-        v_n_m = [wave[n][i] * v[i] * wave[m][i] for i in range(num_points)]
-        return integrate(v_n_m, step)
+        return out
 
-    x = [begin + step * i for i in range(num_points)]
-    v = [V(xi) for xi in x]
-    u0 = [U0(xi) for xi in x]
-    u1 = [U1(xi) for xi in x]
+    def H(m:int, k:int, x:list[float]):
+        phi_m = phi(m, x)
+        Hphi_k = Hphi(k, x)
 
-    energy_index = 0
+        num_points  = len(x)
+        mul = [float] * num_points
+        for i in range(num_points):
+            mul[i] = phi_m[i] * Hphi_k[i]
+        return integrate(mul, step)
 
-    # первая поправка энергии
-    first_order_correction_e = matrix_V(energy_index, energy_index)
-    print("первая поправка энергии=", first_order_correction_e)
+    def get_Matrix(size:int, x:list[float]):
+        return [[H(m, k, x) for k in range(size)] for m in range(size)]
 
-    # вторая поправка энергии
-    secont_order_correction_e = 0
-    for i in range(len(energies)):
-        if(i != energy_index):
-            secont_order_correction_e += (
-                abs(matrix_V(energy_index, i)) ** 2
-            / #--------------------------------------
-               (energies[energy_index] - energies[i])
-            )
-    print("первая поправка энергии=", secont_order_correction_e)
+    size = 6
+    matrix = get_Matrix(size, x)
+    eigenvalues, eigenvectors = LA.eigh(matrix)
+    low = 0
+    for i in range(1, len(eigenvalues)):
+        if eigenvalues[i] < eigenvalues[low]:
+            low = i
 
-    # первая поправка собственной функции
-    const =  matrix_V(0, 1) / (energies[0] - energies[1])
-    mul = [const * w for w in wave[1]]
-    first_order_correction_w = [wave[0][i] + mul[i] for i in range(len(wave[1]))]
+    num_points  = len(x)
+    wave_func = [0.0] * num_points
+    for k in range(size):
+        phi_k = phi(k, x)
+        for i in range(num_points):
+            wave_func[i] += eigenvectors[k][low] * phi_k[i]
+    wave_func = quantum_normalize(wave_func, step)
 
-    # вывод
-    energy = energies[0]
-    print("E_0 = ", energy)
-    energy += first_order_correction_e
-    print("E_0 = ", energy, " 1-ое приближение, ", "поправка =", first_order_correction_e)
-    energy += secont_order_correction_e
-    print("E_0 = ", energy, " 2-ое приближение, ", "поправка =", secont_order_correction_e)
-
-    # Графики
-    plt.axis([begin, end, min_energy, v0])
-    plt.grid(True)
-    plt.axhline(0, color='black')
-    plt.axvline(0, color='black')
-    plt.xlabel("x, a.u.", fontsize = 20, color = "k")
-    plt.ylabel("$U^0(x)$, a.u.", fontsize = 20, color = "k")
-    plt.plot(x, u0, linewidth = 6, color = "red", label = "$U^0(x)$")
-    plt.legend()
-    plt.show()
-
-    plt.axis([begin, end, min_energy, v0])
-    plt.grid(True)
-    plt.axhline(0, color='black')
-    plt.axvline(0, color='black')
-    plt.xlabel("x, a.u.", fontsize = 20, color = "k")
-    plt.ylabel("U(x), a.u.", fontsize = 20, color = "k")
-    plt.plot(x, u1, linewidth = 6, color = "red", label = "U(x)")
-    plt.legend()
-    plt.show()
+    En = eigenvalues[low]
+    print(f"прямой вариационный метод - E = {En}")
+    print(f"метод пристрелки - E = {energies[0]}")
 
     plt.axis([begin, end, min_energy, v0 if v0 > 1 else 1])
     plt.grid(True)
     plt.axhline(0, color='black')
     plt.axvline(0, color='black')
     plt.xlabel("x, a.u.", fontsize = 20, color = "k")
-    plt.plot(x,            forward_n0_pr, linewidth = 6, color = "orange", label = "$phi(x)$, a.u., метод пристрелки")
-    plt.plot(x, first_order_correction_w, linewidth = 3, color = "blue"  , label = "$phi(x)$, a.u., теория возмущений")
-    plt.plot(x,                       u1, linewidth = 6, color = "green" , label = "$U(x)$, a.u.")
+    plt.plot(x, forward_n0, linewidth = 6, color = "orange", label = "$phi(x)$, a.u., метод пристрелки")
+    plt.plot(x,  wave_func, linewidth = 2, color = "blue"  , label = "$phi(x)$, a.u., вариационный принцип")
+    plt.plot(x,          u, linewidth = 6, color = "green" , label = "$U(x)$, a.u.")
     plt.legend()
     plt.show()
-
-################################################################################
-### perturbation end
-################################################################################
 
 main()

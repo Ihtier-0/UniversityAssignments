@@ -246,10 +246,10 @@ print(f"l = {half_width} Ангстрем")
 
 # Перевод величин в атомную систему единиц
 v0 = v0 / 27.211 # атомных единиц
-half_width = half_width / 0.5292 # бор
+half_width = half_width / 0.5292 # атомных единиц
 
 print(f"v0 = {v0} атомных единиц")
-print(f"l = {half_width} бор")
+print(f"l = {half_width} атомных единиц")
 
 def main():
     min_energy = -v0
